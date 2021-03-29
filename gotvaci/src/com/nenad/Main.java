@@ -2,6 +2,8 @@ package com.nenad;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Main {
 
@@ -14,20 +16,24 @@ public class Main {
         Sostojka kakao= new Sostojka("Kakao","gr");
 
         ArrayList<Sostojka> namirnici= new ArrayList<Sostojka>();
+        Lock lockFrizider = new ReentrantLock();
+
         namirnici.add(mleko);
         namirnici.add(brasno);
         namirnici.add(kakao);
 
-        Gotvac g1=new Gotvac("Marko",namirnici);
-        Gotvac g2=new Gotvac("Petko",namirnici);
+        Gotvac g1=new Gotvac("Marko",namirnici,lockFrizider);
+        Gotvac g2=new Gotvac("Petko",namirnici,lockFrizider);
 
-        Dostavuvac d=new Dostavuvac("Mirko",namirnici);
+        Dostavuvac d=new Dostavuvac("Mirko",namirnici,lockFrizider);
 
         // mu kazuva na gotvacot da pocne so rabota
 
 
         g1.start();
         g2.start();
+
+
 
         d.start();
 
@@ -58,6 +64,20 @@ public class Main {
         g2.zgotvi(recept2);
         g1.zgotvi(recept3);
         g2.zgotvi(recept4);
+
+
+        // sme gi dale site recepti za gotvenje
+
+        g1.stopiraj();
+        g2.stopiraj();
+
+
+        g1.join(); // ceka da zavrsi g1
+        g2.join();
+
+        d.stopiraj();
+
+        d.join();
 
 
         // ke treba da im dademe na gotvacite recepti
